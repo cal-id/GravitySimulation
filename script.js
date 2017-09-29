@@ -94,12 +94,32 @@ function initUpdate(){
 	drawButton()
 }
 
+function drawField(){
+	let step = 50;
+	for(let y = 0; y < height ; y += step){
+		for(let x = 0 ; x < width ; x += step){
+			ctx.fillStyle = "yellow";
+			ctx.fillRect(x, y, 3, 3);
+
+			let sum = 0;
+			for(let ball of balls){
+				let dx = x - ball.x, dy = y - ball.y;
+				sum += gravitationalAccel(ball.r, 1,
+					Math.sqrt(dx * dx + dy * dy)).a2;
+			}
+			ctx.font = "20px monospace"
+			ctx.fillText(Math.round(sum), x, y);
+		}
+	}
+}
+
 function update(){
 	//ballMerges()
 	applyGravity()
 	updateBallPositions()
 	if (clear) clearScreen()
 	drawBalls()
+	drawField();
 	drawButton()
 }
 
@@ -112,7 +132,7 @@ function drawArrow(x1, y1, x2, y2, theta, l){
 	var alpha = theta - Math.atan2(x2-x1, y2-y1) * (180/Math.PI)
 	var beta = theta + Math.atan2(x2-x1, y2-y1) * (180/Math.PI)
 	var gamma = Math.atan2(x2-x1, y2-y1) * (180 / Math.PI)
-	
+
 	ctx.beginPath()
 	ctx.moveTo(x1, y1)
 	ctx.lineTo(x2 - l * Math.cos(theta*(Math.PI/180)) * Math.sin(gamma*(Math.PI/180)),
@@ -122,7 +142,7 @@ function drawArrow(x1, y1, x2, y2, theta, l){
 	ctx.lineTo(x2, y2)
 	ctx.lineTo(x2 - l * Math.sin(beta*(Math.PI/180)), y2 - l * Math.cos(beta*(Math.PI/180)))
 	ctx.fill()
-	
+
 	ctx.lineWidth = 1
 }
 
@@ -199,7 +219,7 @@ function ballMerges(){
 					balls.splice(b1, 1)
 					balls.splice(b2, 1)
 					noBalls -= 2
-			    }*/				
+			    }*/
 			}
 		}
 	}
@@ -217,7 +237,7 @@ function merge(b1, b2){
 
 function gravitationalAccel(m1, m2, r){
 	force = gConstant * ((m1 * m2) / Math.pow(r,2))
-	a1 = force / m1	
+	a1 = force / m1
 	a2 = force / m2
 	return {a1: a1, a2: a2}
 }
@@ -230,7 +250,7 @@ function applyGravity(){
 			yDistance = Math.abs(balls[b2].y - balls[b1].y)
 			secondsElapsed = refreshRate / 1000
 			diagAcc = gravitationalAccel(balls[b1].r, balls[b2].r, distanceBetween)
-			
+
 			if (balls[b1].x < balls[b2].x){	//b1 left of b2
 				balls[b1].vx += diagAcc.a1 * (xDistance / distanceBetween) * secondsElapsed
 				balls[b2].vx += diagAcc.a2 * (xDistance / distanceBetween) * secondsElapsed * -1
@@ -238,7 +258,7 @@ function applyGravity(){
 				balls[b1].vx += diagAcc.a1 * (xDistance / distanceBetween) * secondsElapsed * -1
 				balls[b2].vx += diagAcc.a2 * (xDistance / distanceBetween) * secondsElapsed
 			}
-			
+
 			if (balls[b1].y < balls[b2].y){	//b1 above b2
 				balls[b1].vy += diagAcc.a1 * (yDistance / distanceBetween) * secondsElapsed
 				balls[b2].vy += diagAcc.a2 * (yDistance / distanceBetween) * secondsElapsed * -1
@@ -258,4 +278,3 @@ function drawButton(){
 	ctx.textAlign = "center"
 	ctx.fillText(running ? "stop" : "run", width/2, height-(buttonHeight/2) + 12.5)
 }
-
