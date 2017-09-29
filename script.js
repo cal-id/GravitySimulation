@@ -95,11 +95,10 @@ function initUpdate(){
 }
 
 function drawField(){
-	let step = 25;
+	let step = 10;
 	for(let y = 0; y < height ; y += step){
 		for(let x = 0 ; x < width ; x += step){
-			ctx.fillStyle = "yellow";
-
+			// Go through each ball and find the total accelaration vector at this point
 			let sumX = 0;
 			let sumY = 0;
 			for(let ball of balls){
@@ -110,9 +109,20 @@ function drawField(){
 				sumX += force * dx / length;
 				sumY += force * dy / length;
 			}
-			ctx.font = "12px monospace";
-			ctx.fillText(`(${Math.round(sumX)}, ${Math.round(sumY)})`, x, y);
-			drawArrow(x, y, x + sumX, y + sumY, 22, 10)
+			// Use this scaling function to scale the vectors to a manageable size.
+			// Anything where x >>> y for large x would work... This function
+			// uses sign(value) * 2 * log(|value|)
+			const scale = value => Math.abs(value) < 1 ? 0 : Math.abs(value) / value * 2 * Math.log(Math.abs(value));
+			// Draw the vector
+			let fromX = x + scale(sumX);
+			let fromY = y + scale(sumY);
+			let toX = x;
+			let toY = y;
+			ctx.beginPath();
+			ctx.moveTo(fromX, fromY);
+			ctx.lineTo(toX, toY);
+			ctx.strokeStyle = "white";
+			ctx.stroke();
 
 		}
 	}
