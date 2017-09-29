@@ -95,20 +95,25 @@ function initUpdate(){
 }
 
 function drawField(){
-	let step = 50;
+	let step = 25;
 	for(let y = 0; y < height ; y += step){
 		for(let x = 0 ; x < width ; x += step){
 			ctx.fillStyle = "yellow";
-			ctx.fillRect(x, y, 3, 3);
 
-			let sum = 0;
+			let sumX = 0;
+			let sumY = 0;
 			for(let ball of balls){
 				let dx = x - ball.x, dy = y - ball.y;
-				sum += gravitationalAccel(ball.r, 1,
+				let length = Math.sqrt(dx * dx + dy * dy);
+				let force = gravitationalAccel(ball.r, 1,
 					Math.sqrt(dx * dx + dy * dy)).a2;
+				sumX += force * dx / length;
+				sumY += force * dy / length;
 			}
-			ctx.font = "20px monospace"
-			ctx.fillText(Math.round(sum), x, y);
+			ctx.font = "12px monospace";
+			ctx.fillText(`(${Math.round(sumX)}, ${Math.round(sumY)})`, x, y);
+			drawArrow(x, y, x + sumX, y + sumY, 22, 10)
+
 		}
 	}
 }
